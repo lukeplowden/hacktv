@@ -26,11 +26,40 @@
 
 static volatile sig_atomic_t _abort = 0;
 static volatile sig_atomic_t _signal = 0;
+/* At the top of the file, add these variables */
+static volatile int _current_gain = 47;
+static volatile int last_gain = -1;
+static volatile int _gain_direction = 1;
 
 static void _sigint_callback_handler(int signum)
 {
-	_abort = 1;
-	_signal = signum;
+	if (signum == SIGUSR1)
+    {
+        /* Increase gain */
+        _current_gain += 2;
+        if (_current_gain > 47) _current_gain = 47;
+        
+        fprintf(stderr, "\rGain increased to: %d   ", _current_gain);
+        fflush(stderr);
+        
+        /* We'll need to update the gain in the while loop */
+    }
+    else if (signum == SIGUSR2)
+    {
+        /* Decrease gain */
+        _current_gain -= 2;
+        if (_current_gain < 0) _current_gain = 0;
+        
+        fprintf(stderr, "\rGain decreased to: %d   ", _current_gain);
+        fflush(stderr);
+        
+        /* We'll need to update the gain in the while loop */
+    }
+    else
+    {
+		_abort = 1;
+		_signal = signum;
+	}
 }
 
 static void print_version(void)
@@ -982,6 +1011,8 @@ int main(int argc, char *argv[])
 	sigaction(SIGSEGV, &action, NULL);
 	sigaction(SIGTERM, &action, NULL);
 	sigaction(SIGABRT, &action, NULL);
+	sigaction(SIGUSR1, &action, NULL);
+	sigaction(SIGUSR2, &action, NULL);
 #else
 	signal(SIGINT, &_sigint_callback_handler);
 	signal(SIGILL, &_sigint_callback_handler);
@@ -1394,14 +1425,19 @@ int main(int argc, char *argv[])
 			
 			while(!_abort)
 			{
+				    /* Check if gain has changed */
+				if (_current_gain != last_gain)
+				{
+					rf_hackrf_set_gain(&s.rf, _current_gain);
+					last_gain = _current_gain;
+				}
 				vid_line_t *line = vid_next_line(&s.vid);
-				
 				if(line == NULL) break;
-				
+
 				if(rf_write(&s.rf, line->output, line->width) != RF_OK) break;
 				if(line->audio_len && rf_write_audio(&s.rf, line->audio, line->audio_len) != RF_OK) break;
 			}
-			
+
 			if(_signal)
 			{
 				fprintf(stderr, "Caught signal %d\n", _signal);

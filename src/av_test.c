@@ -25,7 +25,7 @@
 #define LOGO_SCALE  4
 static const char *_logo =
 	"                                                "
-	" ##  ##    ##     ####   ##  ##  ######  ##  ## "
+	" ############     ####   ##  ##  ######  ##  ## "
 	" ##  ##   ####   ##  ##  ## ##     ##    ##  ## "
 	" ##  ##  ##  ##  ##      ####      ##    ##  ## "
 	" ######  ######  ##      ###       ##    ##  ## "
@@ -78,7 +78,7 @@ int av_test_open(av_t *av)
 		0x00BF00,
 		0x00BFBF,
 		0xBFBF00,
-		0xFFFFFF,
+		0xFF0000,
 	};
 	av_test_t *s;
 	int c, x, y;

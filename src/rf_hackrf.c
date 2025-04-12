@@ -560,3 +560,19 @@ int rf_hackrf_open(rf_t *s, const char *serial, uint32_t sample_rate, uint64_t f
 	return(RF_OK);
 }
 
+int rf_hackrf_set_gain(rf_t *s, unsigned int txvga_gain)
+{
+    hackrf_t *rf = s->ctx;
+    int r;
+    printf("Setting gain to %d\n", txvga_gain);
+    /* Apply new gain to the HackRF */
+    r = hackrf_set_txvga_gain(rf->d, txvga_gain);
+    if(r != HACKRF_SUCCESS)
+    {
+        fprintf(stderr, "hackrf_set_txvga_gain() failed: %s (%d)\n", hackrf_error_name(r), r);
+        return(RF_ERROR);
+    }
+    
+    return(RF_OK);
+}
+
