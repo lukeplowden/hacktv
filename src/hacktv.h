@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include "video.h"
 #include "rf.h"
+#include "hacktv_osc.h"
 
 /* Return codes */
 #define HACKTV_OK             0

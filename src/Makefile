@@ -14,6 +14,13 @@ ifeq ($(HACKRF),hackrf)
 	CFLAGS += -DHAVE_HACKRF
 endif
 
+LO := $(shell $(PKGCONF) --exists liblo && echo liblo)
+ifeq ($(LO),liblo)
+    OBJS += hacktv_osc.o  # or whatever file you use to hold OSC code
+    PKGS += liblo
+    CFLAGS += -DHAVE_LO
+endif
+
 SOAPYSDR := $(shell $(PKGCONF) --exists SoapySDR && echo SoapySDR)
 ifeq ($(SOAPYSDR),SoapySDR)
 	OBJS += rf_soapysdr.o
