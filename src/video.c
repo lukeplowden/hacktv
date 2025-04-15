@@ -3105,6 +3105,11 @@ static int _vid_next_line_raster(vid_t *s, void *arg, int nlines, vid_line_t **l
 			prgb += (x - s->active_left - s->vframe_x) * s->vframe.pixel_stride;
 			stride = s->vframe.pixel_stride;
 		}
+
+		if (!s->vframe.framebuffer) {
+			fprintf(stderr, "[ERROR] Tried to render with NULL framebuffer!\n");
+			return NULL;
+		}
 		
 		oc = &s->chrominance_buffer[x * 2];
 		for(; x < s->active_left + s->vframe_x + s->vframe.width && x < ar; x++, o += 2, oc += 2, prgb += stride)

@@ -89,7 +89,7 @@ static int _tx_callback(hackrf_transfer *transfer)
 		if(r == 0)
 		{
 			/* Buffer underrun, fill with zero */
-			if(rf->buffers_reader.prefill == NULL) fprintf(stderr, "U");
+			if(rf->buffers_reader.prefill == NULL) fprintf(stderr, "A");
 			
 			memset(buf, 0, l);
 			l = 0;

@@ -56,10 +56,10 @@ void start_osc_server(osc_state_t *osc, const char *port)
 {
     if (!osc) return;
     osc->st = lo_server_thread_new(port, NULL);
-    lo_server_thread_add_method(osc->st, "/gain", "f", osc_gain_handler, osc);
-    lo_server_thread_add_method(osc->st, "/freq", "f", osc_freq_handler, osc);
-    lo_server_thread_add_method(osc->st, "/off", "f", osc_offset_handler, osc);
-    lo_server_thread_add_method(osc->st, "/dev", "f", osc_deviation_handler, osc);
+    // lo_server_thread_add_method(osc->st, "/gain", "f", osc_gain_handler, osc);
+    // lo_server_thread_add_method(osc->st, "/freq", "f", osc_freq_handler, osc);
+    // lo_server_thread_add_method(osc->st, "/off", "f", osc_offset_handler, osc);
+    // lo_server_thread_add_method(osc->st, "/dev", "f", osc_deviation_handler, osc);
     lo_server_thread_add_method(osc->st, "/source", "i", osc_source_handler, osc);
     lo_server_thread_start(osc->st);
     fprintf(stderr, "[OSC] Server started on port %s\n", port);

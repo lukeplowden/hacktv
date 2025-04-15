@@ -30,6 +30,7 @@ static volatile sig_atomic_t _signal = 0;
 
 static void _sigint_callback_handler(int signum)
 {
+	printf("\nReceived signal %d, exiting...\n", signum);
 	_abort = 1;
 	_signal = signum;
 }
@@ -1346,7 +1347,7 @@ int main(int argc, char *argv[])
 
 	// start_osc_server("7770");
 	#ifdef HAVE_LO
-    osc_state_t osc_state;  // Declare your OSC state structure
+    osc_state_t osc_state = {0};  // Declare your OSC state structure
     start_osc_server(&osc_state, "7770");
 	#endif
 	
@@ -1368,6 +1369,8 @@ int main(int argc, char *argv[])
 		
 		for(c = optind; c < argc && !_abort; c++)
 		{
+			printf("Opening %s\n", argv[c]);
+
 			/* Get a pointer to the output prefix and target */
 			pre = argv[c];
 			sub = strchr(pre, ':');
@@ -1400,19 +1403,31 @@ int main(int argc, char *argv[])
 				/* Error opening this source. Move to the next */
 				continue;
 			}
-			
+
+			// -f 5680000000 -g 47 -m pal-fm --offset 4000000 -D 5000000 ~/Downloads/diamond.mp4 ~/Downloads/1F29006F-1CAA-45BD-AC87-D64D63E0C4D2.mp4  --repeat
+
 			while(!_abort)
 			{
-				// if (osc_state.changed & OSC_SRC_CHANGED) {
-				// 	if (c >= optind) {
-				// 		c = optind - 1;
-				// 	} else if (c < 0) {
-				// 		c = 0;
-				// 	} else {
-				// 		c = osc_state.src;
-				// 	}
-				// 	break;
-				// }
+				if (osc_state.changed & OSC_SRC_CHANGED) {
+					int num_sources = argc - optind;
+					int new_c = optind + osc_state.src;
+
+					// printf("osc_state.src: %d\n", osc_state.src);
+					// printf("new_c: %d\n", new_c);
+					// printf("arg: %s\n", argv[new_c]);
+					if (osc_state.src >= 0 && osc_state.src < num_sources)
+					{
+						fprintf(stderr, "[OSC] Changing source from index %d to %d\n", c - optind, osc_state.src);
+						osc_state.changed &= ~OSC_SRC_CHANGED;
+						c = new_c - 1; // Outer loop increments c after inner loop
+						break;
+					}
+					else
+					{
+						fprintf(stderr, "[OSC] Invalid source index (%d)\n", osc_state.src);
+						osc_state.changed &= ~OSC_SRC_CHANGED;
+					}			
+				}
 
 				vid_line_t *line = vid_next_line(&s.vid);
 				if(line == NULL) break;
@@ -1427,7 +1442,9 @@ int main(int argc, char *argv[])
 				_signal = 0;
 			}
 			
+			printf("closing");
 			av_close(&s.vid.av);
+			s.vid.vframe.framebuffer = NULL;
 		}
 	}
 	while(s.repeat && !_abort);
