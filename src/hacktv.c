@@ -30,7 +30,6 @@ static volatile sig_atomic_t _signal = 0;
 
 static void _sigint_callback_handler(int signum)
 {
-	printf("\nReceived signal %d, exiting...\n", signum);
 	_abort = 1;
 	_signal = signum;
 }
@@ -1412,9 +1411,6 @@ int main(int argc, char *argv[])
 					int num_sources = argc - optind;
 					int new_c = optind + osc_state.src;
 
-					// printf("osc_state.src: %d\n", osc_state.src);
-					// printf("new_c: %d\n", new_c);
-					// printf("arg: %s\n", argv[new_c]);
 					if (osc_state.src >= 0 && osc_state.src < num_sources)
 					{
 						fprintf(stderr, "[OSC] Changing source from index %d to %d\n", c - optind, osc_state.src);
@@ -1442,7 +1438,6 @@ int main(int argc, char *argv[])
 				_signal = 0;
 			}
 			
-			printf("closing");
 			av_close(&s.vid.av);
 			s.vid.vframe.framebuffer = NULL;
 		}

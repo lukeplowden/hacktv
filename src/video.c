@@ -3107,7 +3107,7 @@ static int _vid_next_line_raster(vid_t *s, void *arg, int nlines, vid_line_t **l
 		}
 
 		if (!s->vframe.framebuffer) {
-			fprintf(stderr, "[ERROR] Tried to render with NULL framebuffer!\n");
+			// fprintf(stderr, "[ERROR] Tried to render with NULL framebuffer!\n");
 			return NULL;
 		}
 		
